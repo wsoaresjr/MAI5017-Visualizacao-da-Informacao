@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audiência Compartilhada no YouTube · MAI5017 - Visualização da Informação</title>
+<meta name="description" content="Mapeamento de sobreposição de audiência entre canais brasileiros de jornalismo a partir da análise pública de transmissões ao vivo — período 20/05/2026 a 20/06/2026.">
+
+<style>
+/* ── Reset e base ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy:    #10243E;
+  --navy2:   #1B3A5C;
+  --teal:    #2A9D8F;
+  --coral:   #E76F51;
+  --ink:     #1B263B;
+  --muted:   #667085;
+  --panel:   #F2F6F7;
+  --white:   #ffffff;
+  --border:  #D8DEE3;
+  --blue-lt: #5B8DB8;
+  --r: 10px;
+  --shadow: 0 4px 24px rgba(16,36,62,.10);
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Segoe UI', Calibri, Arial, sans-serif;
+  color: var(--ink);
+  background: #f7f9fb;
+  line-height: 1.65;
+}
+a { color: var(--teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; display: block; }
+
+/* ── Tipografia ───────────────────────────────────────────────── */
+h1,h2,h3,h4 { font-family: Cambria, Georgia, serif; line-height: 1.18; }
+h1 { font-size: clamp(2rem, 5vw, 3.4rem); }
+h2 { font-size: clamp(1.5rem, 3vw, 2.2rem); }
+h3 { font-size: 1.2rem; }
+h4 { font-size: 1rem; }
+.kicker {
+  font-size: .78rem; font-weight: 700; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--teal);
+}
+.lead { font-size: 1.1rem; color: var(--muted); }
+
+/* ── Layout ───────────────────────────────────────────────────── */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+section { padding: 5rem 0; }
+section:nth-child(even) { background: var(--white); }
+
+/* ── Menu de Navegação ────────────────────────────────────────── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(16,36,62,.97); backdrop-filter: blur(8px);
+  padding: .85rem 0;
+}
+.nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 1100px; margin: 0 auto; padding: 0 1.5rem;
+}
+.nav-logo { color: #fff; font-family: Cambria, serif; font-size: 1.05rem; font-weight: 700; }
+.nav-logo span { color: var(--teal); }
+.nav-links { display: flex; gap: 1.6rem; list-style: none; }
+.nav-links a { color: #c9d6e3; font-size: .88rem; font-weight: 500; transition: color .2s; }
+.nav-links a:hover { color: #fff; text-decoration: none; }
+.nav-toggle { display: none; background: none; border: none; cursor: pointer; }
+.nav-toggle span { display: block; width: 24px; height: 2px; background: #fff; margin: 5px 0; }
+
+/* ── Hero ─────────────────────────────────────────────────────── */
+#hero {
+  background: linear-gradient(135deg, var(--navy) 60%, #1d4b7c 100%);
+  color: #fff; padding: 7rem 0 5rem;
+  position: relative; overflow: hidden;
+}
+#hero::before {
+  content: '';
+  position: absolute; top: -120px; right: -120px;
+  width: 480px; height: 480px; border-radius: 50%;
+  background: var(--navy2); opacity: .7;
+}
+#hero::after {
+  content: '';
+  position: absolute; bottom: -80px; left: -80px;
+  width: 280px; height: 280px; border-radius: 50%;
+  background: var(--teal); opacity: .12;
+}
+.hero-inner { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+.hero-kicker { color: var(--teal); margin-bottom: .6rem; }
+#hero h1 { color: #fff; margin-bottom: 1.2rem; max-width: 780px; }
+#hero .lead { color: #c9d6e3; max-width: 680px; margin-bottom: 2.2rem; }
+.hero-badges { display: flex; flex-wrap: wrap; gap: .7rem; margin-bottom: 2.8rem; }
+.badge {
+  background: rgba(42,157,143,.18); border: 1px solid rgba(42,157,143,.4);
+  color: #9be3dc; font-size: .8rem; font-weight: 600; padding: .3rem .75rem; border-radius: 100px;
+}
+.hero-stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 1px;
+  background: rgba(255,255,255,.1); border-radius: var(--r); overflow: hidden;
+  max-width: 680px;
+}
+.stat {
+  background: rgba(27,58,92,.6); padding: 1.2rem 1.4rem; text-align: center;
+}
+.stat-num { font-family: Cambria, serif; font-size: 2rem; font-weight: 700; color: #fff; line-height: 1;  white-space: nowrap;}
+.stat-label { font-size: .78rem; color: #8fa3b8; margin-top: .3rem; }
+
+/* ── Sobre / Contexto ─────────────────────────────────────────── */
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
+.about-cards { display: flex; flex-direction: column; gap: 1rem; }
+.about-card {
+  display: flex; gap: 1rem; align-items: flex-start;
+  background: var(--panel); border-radius: var(--r); padding: 1.2rem 1.4rem;
+  border-left: 4px solid var(--teal);
+}
+.about-card.coral { border-color: var(--coral); }
+.about-card.navy { border-color: var(--navy2); }
+.about-num {
+  font-family: Cambria, serif; font-size: 1.5rem; font-weight: 700;
+  color: var(--teal); min-width: 1.8rem; line-height: 1;
+}
+.about-card.coral .about-num { color: var(--coral); }
+.about-card.navy .about-num  { color: var(--navy2); }
+.about-card h4 { font-size: .95rem; margin-bottom: .25rem; }
+.about-card p  { font-size: .88rem; color: var(--muted); }
+
+/* ── Eixos ────────────────────────────────────────────────────── */
+.eixos-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 2.5rem; }
+.eixo-card {
+  background: var(--white); border-radius: var(--r); box-shadow: var(--shadow);
+  overflow: hidden; transition: transform .2s, box-shadow .2s;
+}
+.eixo-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(16,36,62,.14); }
+.eixo-header { padding: 1.4rem 1.4rem 1rem; border-bottom: 3px solid currentColor; }
+.eixo-header.a { color: var(--blue-lt); }
+.eixo-header.b { color: var(--teal); }
+.eixo-header.c { color: var(--coral); }
+.eixo-letter {
+  width: 44px; height: 44px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center;
+  font-family: Cambria, serif; font-size: 1.5rem; font-weight: 700;
+  color: #fff; margin-bottom: .8rem;
+}
+.eixo-header.a .eixo-letter { background: var(--blue-lt); }
+.eixo-header.b .eixo-letter { background: var(--teal); }
+.eixo-header.c .eixo-letter { background: var(--coral); }
+.eixo-header h3 { color: var(--ink); font-size: 1.05rem; margin-bottom: .4rem; }
+.eixo-header p  { font-size: .85rem; color: var(--muted); font-style: italic; }
+.eixo-tags { padding: .8rem 1.4rem 1.2rem; display: flex; flex-wrap: wrap; gap: .4rem; }
+.tag {
+  font-size: .72rem; font-weight: 600; padding: .22rem .6rem; border-radius: 100px;
+  background: var(--panel); color: var(--muted); border: 1px solid var(--border);
+}
+
+/* ── Metodologia ──────────────────────────────────────────────── */
+.method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+.method-col h3 { font-size: 1.05rem; margin-bottom: 1rem; color: var(--navy); }
+.method-list { list-style: none; display: flex; flex-direction: column; gap: .7rem; }
+.method-list li {
+  display: flex; gap: .75rem; align-items: flex-start;
+  font-size: .92rem; color: var(--ink);
+}
+.method-list li::before {
+  content: '▸'; color: var(--teal); font-size: .8rem; margin-top: .22rem; flex-shrink: 0;
+}
+.method-table-wrap { margin-top: 1.5rem; }
+.method-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.method-table th {
+  background: var(--panel); color: var(--muted); font-size: .78rem;
+  letter-spacing: .08em; text-transform: uppercase; padding: .7rem 1rem; text-align: left;
+}
+.method-table td { padding: .8rem 1rem; border-bottom: 1px solid var(--border); }
+.method-table td:last-child { color: var(--teal); font-weight: 700; }
+.privacy-box {
+  margin-top: 1.5rem; background: var(--panel); border-radius: var(--r);
+  padding: 1.1rem 1.3rem; border-left: 4px solid var(--teal);
+  font-size: .88rem; color: var(--muted);
+}
+.privacy-box strong { color: var(--navy); display: block; margin-bottom: .3rem; }
+.channels-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr));
+  gap: .6rem; margin-top: 1.2rem;
+}
+.channel-chip {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--r); padding: .55rem .9rem;
+  font-size: .85rem; font-weight: 600; color: var(--navy);
+  display: flex; align-items: center; gap: .5rem;
+}
+.channel-chip::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+.channel-chip.extra::before { background: var(--coral); }
+
+/* ── Seção header ───────────────────────────────────────────── */
+.section-header { margin-bottom: 2.5rem; }
+.section-header p { margin-top: .6rem; max-width: 680px; }
+
+/* ── Seção de Visualização ───────────────────────────────────── */
+.viz-section { padding: 5rem 0; }
+.viz-section:nth-child(odd) { background: #f7f9fb; }
+.viz-section:nth-child(even) { background: var(--white); }
+
+.eixo-divider {
+  display: flex; align-items: center; gap: 1.2rem; margin-bottom: 3rem;
+  padding: 1.5rem 1.8rem; border-radius: var(--r);
+  background: var(--navy);
+}
+.eixo-divider.a { background: linear-gradient(120deg, var(--navy) 70%, #1d4266 100%); }
+.eixo-divider.b { background: linear-gradient(120deg, var(--navy) 70%, #0d3535 100%); }
+.eixo-divider.c { background: linear-gradient(120deg, var(--navy) 70%, #3d1a0f 100%); }
+.eixo-badge {
+  width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: Cambria, serif; font-size: 1.8rem; font-weight: 700; color: #fff;
+}
+.eixo-divider.a .eixo-badge { background: var(--blue-lt); }
+.eixo-divider.b .eixo-badge { background: var(--teal); }
+.eixo-divider.c .eixo-badge { background: var(--coral); }
+.eixo-divider-text h2 { color: #fff; font-size: 1.4rem; }
+.eixo-divider-text p  { color: #c9d6e3; font-size: .9rem; font-style: italic; margin-top: .3rem; }
+
+.viz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.viz-card {
+  background: var(--white); border-radius: var(--r); box-shadow: var(--shadow);
+  overflow: hidden; transition: transform .2s, box-shadow .2s; cursor: pointer;
+}
+.viz-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(16,36,62,.14); }
+.viz-card.wide { grid-column: span 2; }
+.viz-img {
+  width: 100%; aspect-ratio: 16/9; overflow: hidden; background: var(--panel);
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+.viz-img img { width: 100%; height: 100%; object-fit: contain; transition: transform .3s; }
+.viz-card:hover .viz-img img { transform: scale(1.03); }
+.viz-body { padding: 1.1rem 1.3rem 1.4rem; }
+.viz-id { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--teal); margin-bottom: .35rem; }
+.viz-card h3 { font-size: 1rem; margin-bottom: .3rem; }
+.viz-card .question { font-size: .85rem; color: var(--muted); font-style: italic; margin-bottom: .8rem; }
+.insights { list-style: none; display: flex; flex-direction: column; gap: .45rem; }
+.insights li { font-size: .84rem; color: var(--ink); display: flex; gap: .55rem; align-items: flex-start; }
+.insights li::before { content: '•'; color: var(--teal); font-size: 1rem; flex-shrink: 0; line-height: 1.5; }
+.expand-btn {
+  background: none; border: none; color: var(--teal); font-size: .82rem;
+  font-weight: 600; cursor: pointer; margin-top: .6rem; padding: 0;
+}
+
+/* ── Insights extras ──────────────────────────────────────────── */
+.insights-extra-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+
+/* ── Conclusões ──────────────────────────────────────────────── */
+#conclusoes { background: var(--navy); }
+#conclusoes .kicker { color: var(--teal); }
+#conclusoes h2 { color: #fff; }
+#conclusoes .lead { color: #c9d6e3; }
+.conclusions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2.5rem; }
+.conclusion-card {
+  background: var(--navy2); border-radius: var(--r); padding: 1.5rem;
+  border-left: 5px solid var(--teal); transition: transform .2s;
+}
+.conclusion-card:hover { transform: translateY(-3px); }
+.conclusion-card:nth-child(2) { border-color: var(--coral); }
+.conclusion-card:nth-child(3) { border-color: var(--blue-lt); }
+.conclusion-card h3 { color: #fff; font-size: 1.05rem; margin-bottom: .6rem; }
+.conclusion-card p  { font-size: .9rem; color: #c9d6e3; }
+
+/* ── Limitações ──────────────────────────────────────────────── */
+.limits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+.limits-col h3 { font-size: 1.05rem; color: var(--navy); margin-bottom: 1rem; }
+.limits-col ul { list-style: none; display: flex; flex-direction: column; gap: .7rem; }
+.limits-col ul li { font-size: .91rem; display: flex; gap: .7rem; align-items: flex-start; }
+.limits-col ul li::before { content: '—'; color: var(--coral); font-weight: 700; flex-shrink: 0; }
+.next-col ul li::before { content: '→'; color: var(--teal); font-weight: 700; flex-shrink: 0; }
+
+/* ── Equipe ─────────────────────────────────────────────────────── */
+#equipe { background: var(--white); }
+.team-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 2rem; }
+.team-card {
+  background: var(--panel); border-radius: var(--r); padding: 1.8rem 1.4rem 1.5rem;
+  text-align: center; box-shadow: var(--shadow);
+}
+.team-photo-wrap {
+  width: 96px; height: 96px; border-radius: 50%; margin: 0 auto 1.1rem;
+  overflow: hidden; border: 3px solid var(--border); position: relative;
+  background: var(--navy);
+}
+.team-photo-wrap img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.team-photo-fallback {
+  width: 100%; height: 100%; display: none; align-items: center; justify-content: center;
+  font-family: Cambria, serif; font-size: 2rem; font-weight: 700; color: #fff;
+  position: absolute; inset: 0;
+}
+.team-card h4 { font-size: 1rem; margin-bottom: .4rem; }
+.team-card .team-email {
+  font-size: .82rem; color: var(--teal); display: block; margin-bottom: .6rem;
+  word-break: break-all;
+}
+.team-linkedin {
+  display: inline-flex; align-items: center; gap: .35rem;
+  font-size: .8rem; font-weight: 600; color: #0a66c2;
+  background: #e8f0fb; border-radius: 100px; padding: .3rem .85rem;
+  transition: background .2s;
+}
+.team-linkedin:hover { background: #cddaf5; text-decoration: none; }
+.team-linkedin svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+/* ── Aplicações profissionais ──────────────────────────────────── */
+#aplicacoes { background: #f7f9fb; }
+.use-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+  gap: 1.5rem; margin-top: 2.5rem;
+}
+.use-card {
+  background: var(--white); border-radius: var(--r); padding: 1.5rem 1.4rem;
+  box-shadow: var(--shadow); border-top: 4px solid var(--teal);
+  transition: transform .2s, box-shadow .2s;
+}
+.use-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(16,36,62,.14); }
+.use-card:nth-child(2) { border-color: var(--coral); }
+.use-card:nth-child(3) { border-color: var(--blue-lt); }
+.use-card:nth-child(4) { border-color: #9b59b6; }
+.use-card:nth-child(5) { border-color: #27ae60; }
+.use-card:nth-child(6) { border-color: #e67e22; }
+.use-icon { font-size: 1.8rem; margin-bottom: .7rem; }
+.use-card h3 { font-size: 1rem; margin-bottom: .5rem; color: var(--navy); }
+.use-card p  { font-size: .88rem; color: var(--muted); line-height: 1.55; }
+
+/* ── Vídeo + Artigo ────────────────────────────────────────────── */
+#recursos { background: var(--white); }
+.recursos-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;
+  align-items: start; margin-top: 2.5rem;
+}
+.video-wrap {
+  position: relative; padding-bottom: 56.25%; height: 0;
+  border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow);
+  background: var(--navy);
+}
+.video-wrap iframe {
+  position: absolute; inset: 0; width: 100%; height: 100%; border: 0;
+}
+.video-placeholder {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1rem;
+  background: linear-gradient(135deg, var(--navy) 60%, var(--navy2));
+  color: #c9d6e3; text-align: center; padding: 2rem;
+}
+.video-placeholder .play-btn {
+  width: 64px; height: 64px; border-radius: 50%; background: var(--coral);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.video-placeholder .play-btn svg { width: 28px; height: 28px; fill: #fff; margin-left: 4px; }
+.video-placeholder p { font-size: .9rem; font-style: italic; }
+.artigo-box {
+  background: var(--panel); border-radius: var(--r); padding: 2rem;
+  box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 1.2rem;
+}
+.artigo-box h3 { font-size: 1.1rem; color: var(--navy); }
+.artigo-box p  { font-size: .9rem; color: var(--muted); line-height: 1.6; }
+.artigo-meta { font-size: .8rem; color: var(--muted); }
+.artigo-meta span { display: inline-block; margin-right: 1rem; }
+.btn-pdf {
+  display: inline-flex; align-items: center; gap: .55rem;
+  background: var(--navy); color: #fff; padding: .8rem 1.5rem;
+  border-radius: var(--r); font-size: .92rem; font-weight: 600;
+  transition: background .2s; align-self: flex-start;
+}
+.btn-pdf:hover { background: var(--navy2); text-decoration: none; }
+.btn-pdf svg { width: 18px; height: 18px; fill: #fff; flex-shrink: 0; }
+.btn-pdf.disabled { background: var(--muted); cursor: not-allowed; pointer-events: none; }
+
+@media (max-width: 860px) {
+  .recursos-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Rodapé ───────────────────────────────────────────────────── */
+footer {
+  background: var(--navy); color: #8fa3b8;
+  padding: 2.5rem 0; font-size: .85rem;
+}
+.footer-inner {
+  max-width: 1100px; margin: 0 auto; padding: 0 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 1rem;
+}
+footer a { color: var(--teal); }
+
+/* ── Modal ────────────────────────────────────────────────────── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 999;
+  background: rgba(10,20,35,.88); align-items: center; justify-content: center;
+  padding: 1.5rem;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: #fff; border-radius: var(--r); max-width: 1000px; width: 100%;
+  max-height: 92vh; overflow-y: auto; box-shadow: 0 24px 80px rgba(0,0,0,.4);
+  animation: modalIn .22s ease;
+}
+@keyframes modalIn { from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.modal-head {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 1.2rem 1.5rem .8rem; border-bottom: 1px solid var(--border);
+}
+.modal-head h3 { font-size: 1.1rem; max-width: 80%; }
+.modal-close {
+  background: none; border: none; font-size: 1.5rem; cursor: pointer;
+  color: var(--muted); line-height: 1; padding: 0 .2rem;
+}
+.modal-img { width: 100%; display: block; }
+.modal-body { padding: 1.2rem 1.5rem 1.5rem; }
+.modal-insights { list-style: none; display: flex; flex-direction: column; gap: .55rem; margin-top: .8rem; }
+.modal-insights li { font-size: .92rem; display: flex; gap: .6rem; align-items: flex-start; }
+.modal-insights li::before { content: '›'; color: var(--teal); font-size: 1.1rem; font-weight: 700; flex-shrink: 0; }
+
+/* ── Responsividade ───────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .about-grid, .method-grid, .viz-grid, .conclusions-grid, .limits-grid, .insights-extra-grid { grid-template-columns: 1fr; }
+  .viz-card.wide { grid-column: span 1; }
+  .eixos-grid { grid-template-columns: 1fr; }
+  .team-grid { grid-template-columns: 1fr 1fr; }
+  .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: var(--navy); padding: 1rem 1.5rem; }
+  .nav-links.open { display: flex; }
+  .nav-toggle { display: block; }
+}
+@media (max-width: 500px) {
+  .team-grid { grid-template-columns: 1fr; }
+  .hero-stats { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── Efeito ────────────────────────────────────────────── */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity .55s ease, transform .55s ease; }
+.reveal.visible { opacity: 1; transform: none; }
+
+/* ── Repositório GitHub ──────────────────────────────────────── */
+#repositorio { background: var(--navy); }
+#repositorio .kicker { color: var(--teal); }
+#repositorio h2 { color: #fff; }
+#repositorio .lead { color: #c9d6e3; }
+.repo-card {
+  margin-top: 2.5rem;
+  background: var(--navy2);
+  border-radius: var(--r);
+  padding: 2.2rem 2.4rem;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(42,157,143,.25);
+  display: flex; gap: 2.5rem; align-items: flex-start;
+  flex-wrap: wrap;
+}
+.repo-icon {
+  flex-shrink: 0;
+  width: 72px; height: 72px; border-radius: 50%;
+  background: rgba(42,157,143,.15); border: 2px solid var(--teal);
+  display: flex; align-items: center; justify-content: center;
+}
+.repo-icon svg { width: 36px; height: 36px; fill: var(--teal); }
+.repo-info { flex: 1; min-width: 240px; }
+.repo-info h3 { color: #fff; font-size: 1.2rem; margin-bottom: .5rem; }
+.repo-info p  { color: #c9d6e3; font-size: .92rem; line-height: 1.65; margin-bottom: 1.1rem; }
+.repo-url-box {
+  background: rgba(0,0,0,.3);
+  border: 1px solid rgba(42,157,143,.35);
+  border-radius: 6px;
+  padding: .75rem 1.1rem;
+  display: flex; align-items: center; gap: .85rem;
+  flex-wrap: wrap;
+}
+.repo-url-box code {
+  font-family: 'Courier New', monospace; font-size: .9rem;
+  color: #9be3dc; word-break: break-all; flex: 1;
+}
+.btn-repo {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: var(--teal); color: #fff; padding: .55rem 1.25rem;
+  border-radius: 6px; font-size: .88rem; font-weight: 700;
+  white-space: nowrap; transition: background .2s; flex-shrink: 0;
+}
+.btn-repo:hover { background: #23877b; text-decoration: none; }
+.btn-repo svg { width: 16px; height: 16px; fill: #fff; flex-shrink: 0; }
+.repo-tags { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+.repo-tag {
+  font-size: .72rem; font-weight: 700; padding: .22rem .7rem; border-radius: 100px;
+  background: rgba(42,157,143,.12); color: #9be3dc;
+  border: 1px solid rgba(42,157,143,.3);
+}
+.repo-contents {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 1rem; margin-top: 2rem;
+}
+.repo-item {
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  border-radius: var(--r); padding: 1rem 1.2rem;
+}
+.repo-item-icon { font-size: 1.4rem; margin-bottom: .4rem; }
+.repo-item h4 { color: #e2eaf4; font-size: .9rem; margin-bottom: .3rem; }
+.repo-item p  { color: #8fa3b8; font-size: .8rem; line-height: 1.5; }
+.repo-note {
+  margin-top: 1.5rem; font-size: .82rem; color: #8fa3b8; font-style: italic;
+  padding: .7rem 1rem; border-left: 3px solid rgba(42,157,143,.4);
+  background: rgba(42,157,143,.05); border-radius: 0 6px 6px 0;
+}
+@media (max-width: 860px) {
+  .repo-card { flex-direction: column; gap: 1.4rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     MENU DE NAVEGAÇÃO
+═══════════════════════════════════════════════════ -->
+<nav>
+  <div class="nav-inner">
+    <span class="nav-logo">Audiência<span> Compartilhada</span></span>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#sobre">Sobre</a></li>
+      <li><a href="#metodologia">Metodologia</a></li>
+      <li><a href="#eixo-a">Eixo A</a></li>
+      <li><a href="#eixo-b">Eixo B</a></li>
+      <li><a href="#eixo-c">Eixo C</a></li>
+      <li><a href="#insights">Insights</a></li>
+      <li><a href="#aplicacoes">Aplicações</a></li>
+      <li><a href="#recursos">Vídeo e Artigo</a></li>
+      <li><a href="#repositorio">Repositório</a></li>
+      <li><a href="#equipe">Equipe</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-inner">
+    <p class="kicker hero-kicker">MAI5017 · Visualização da Informação · ICMC-USP · Junho 2026</p>
+    <h1>Estudo de Audiência Compartilhada no YouTube</h1>
+    <p class="lead">Mapeamento de sobreposição de audiência entre canais brasileiros de jornalismo a partir da análise pública do chat de transmissões ao vivo — período 20/05/2026 a 20/06/2026.</p>
+    <div class="hero-badges">
+      <span class="badge">27 visualizações</span>
+      <span class="badge">12 canais monitorados</span>
+      <span class="badge">30 dias de dados</span>
+      <span class="badge">3 eixos de análise</span>
+      <span class="badge">Python · Plotly · NetworkX · sklearn</span>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">12</div><div class="stat-label">Canais</div></div>
+      <div class="stat"><div class="stat-num">2.133</div><div class="stat-label">Transmissões</div></div>
+      <div class="stat"><div class="stat-num">1,86M</div><div class="stat-label">Mensagens de chat</div></div>
+      <div class="stat"><div class="stat-num">99 mil</div><div class="stat-label">Autores únicos</div></div>
+      <div class="stat"><div class="stat-num">12,5%</div><div class="stat-label">Circulam entre canais</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SOBRE
+═══════════════════════════════════════════════════ -->
+<section id="sobre">
+  <div class="container">
+    <div class="about-grid">
+      <div>
+        <p class="kicker">Contexto</p>
+        <h2 style="margin:.4rem 0 1rem">Por que olhar para o chat ao vivo?</h2>
+        <p style="margin-bottom:1rem">Quando uma marca ou veículo busca entender sua concorrência no YouTube, o instrumental disponível costuma se limitar a métricas de consumo passivo — views, inscritos, watch time. Esses números medem volume de exposição, mas não respondem a perguntas estruturais sobre <em>quem é o público</em> e <em>se ele é compartilhado com concorrentes</em>.</p>
+        <p>Acima dessas métricas existe uma camada raramente explorada: o <strong>chat ao vivo</strong>. Quem comenta em uma live se expõe publicamente, com identidade rastreável via channel ID — um sinal de engajamento de ordem superior, até aqui sem estudo sistemático publicado no mercado brasileiro.</p>
+      </div>
+      <div class="about-cards">
+        <div class="about-card navy">
+          <div class="about-num">1</div>
+          <div>
+            <h4>Views, inscritos, watch time</h4>
+            <p>Medem exposição — não revelam quem é o público nem se ele migra entre concorrentes.</p>
+          </div>
+        </div>
+        <div class="about-card">
+          <div class="about-num">2</div>
+          <div>
+            <h4>Chat ao vivo</h4>
+            <p>Sinal de engajamento ativo, com identidade pública rastreável (channel ID).</p>
+          </div>
+        </div>
+        <div class="about-card coral">
+          <div class="about-num">3</div>
+          <div>
+            <h4>Lacuna no Brasil</h4>
+            <p>Nenhum estudo sistemático equivalente publicado sobre audiência compartilhada via chat.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:4rem">
+      <p class="kicker">Estrutura do trabalho</p>
+      <h2 style="margin:.4rem 0 .6rem">Três eixos, três perguntas de pesquisa</h2>
+      <p class="lead">A disciplina de Visualização da Informação é organizada em três assuntos centrais. O trabalho contempla os três, cada um ancorado em uma pergunta específica.</p>
+      <div class="eixos-grid" style="margin-top:2rem">
+        <div class="eixo-card">
+          <div class="eixo-header a">
+            <div class="eixo-letter">A</div>
+            <h3>Dados Multivariados</h3>
+            <p>Quais canais apresentam padrões semelhantes ou distintos de engajamento, volume, diversidade de audiência e intensidade temporal?</p>
+          </div>
+          <div class="eixo-tags">
+            <span class="tag">Scatter</span><span class="tag">Heatmap z-score</span>
+            <span class="tag">Coord. paralelas</span><span class="tag">PCA</span>
+          </div>
+        </div>
+        <div class="eixo-card">
+          <div class="eixo-header b">
+            <div class="eixo-letter">B</div>
+            <h3>Documentos e Textos</h3>
+            <p>Quais temas, emoções e padrões discursivos aparecem nos chats e como se relacionam com os assuntos das transmissões?</p>
+          </div>
+          <div class="eixo-tags">
+            <span class="tag">Wordcloud</span><span class="tag">Heatmap temático</span>
+            <span class="tag">Timeline</span><span class="tag">t-SNE</span>
+            <span class="tag">Fala×Chat</span><span class="tag">Emojis</span>
+          </div>
+        </div>
+        <div class="eixo-card">
+          <div class="eixo-header c">
+            <div class="eixo-letter">C</div>
+            <h3>Árvores e Grafos</h3>
+            <p>Como os usuários se distribuem entre os canais e quais canais compartilham audiência ativa?</p>
+          </div>
+          <div class="eixo-tags">
+            <span class="tag">Matriz Jaccard</span><span class="tag">Grafo</span>
+            <span class="tag">Cordas</span><span class="tag">Sankey</span><span class="tag">Dendrograma</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     METODOLOGIA
+═══════════════════════════════════════════════════ -->
+<section id="metodologia">
+  <div class="container">
+    <p class="kicker">Metodologia</p>
+    <h2 style="margin:.4rem 0 .6rem">Coleta, escopo e privacidade dos dados</h2>
+    <p class="lead" style="margin-bottom:2.5rem">Dados coletados exclusivamente de fontes públicas via YouTube Data API v3 e chat replay.</p>
+
+    <div class="method-grid">
+      <div>
+        <h3>O que foi coletado</h3>
+        <ul class="method-list">
+          <li>Transmissões ao vivo dos canais com título, agendamento e horários</li>
+          <li>Mensagens públicas do chat: texto, timestamp, super chat e offset de vídeo</li>
+          <li>Transcrições das lives para cruzar fala do canal × reação do público</li>
+          <li>Métricas de audiência simultânea (CCV), views, likes e comentários</li>
+        </ul>
+
+        <div class="privacy-box" style="margin-top:1.5rem">
+          <strong>🔒 Privacidade: hash do identificador</strong>
+          Nenhum channel_id real é armazenado. Cada identificador passa por SHA-256 com salt fixo antes de ser persistido. Desenho alinhado à LGPD (Art. 6º, IX e Art. 12).
+        </div>
+      </div>
+
+      <div>
+        <h3>Janela de coleta</h3>
+        <div class="method-table-wrap">
+          <table class="method-table">
+            <thead>
+              <tr><th>Dimensão</th><th>Proposto</th><th>Executado</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Período</td><td>30 dias</td><td>20/05/2026 – 20/06/2026</td></tr>
+              <tr><td>Canais</td><td>6 canais</td><td>12 canais</td></tr>
+              <tr><td>Lives</td><td>—</td><td>2.133</td></tr>
+              <tr><td>Mensagens</td><td>—</td><td>1.855.415</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:.82rem;color:var(--muted);margin-top:.7rem;font-style:italic">O período executado coincide com o proposto. A amostra foi ampliada de 6 para 12 canais, aumentando a heterogeneidade editorial.</p>
+
+        <h3 style="margin-top:1.6rem">Canais monitorados</h3>
+        <div class="channels-grid">
+          <div class="channel-chip">CNN Brasil</div>
+          <div class="channel-chip">Jovem Pan News</div>
+          <div class="channel-chip">SBT News</div>
+          <div class="channel-chip">Band Jornalismo</div>
+          <div class="channel-chip">TV Cultura</div>
+          <div class="channel-chip">TV 247</div>
+          <div class="channel-chip extra">UOL</div>
+          <div class="channel-chip extra">Metrópoles TV</div>
+          <div class="channel-chip extra">ICL Notícias</div>
+          <div class="channel-chip extra">Gazeta do Povo</div>
+          <div class="channel-chip extra">Revista Oeste</div>
+          <div class="channel-chip extra">Poder360</div>
+        </div>
+        <p style="font-size:.78rem;color:var(--muted);margin-top:.6rem">
+          <span style="display:inline-flex;align-items:center;gap:.3rem"><span style="width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block"></span> Propostos originalmente</span> &nbsp;
+          <span style="display:inline-flex;align-items:center;gap:.3rem"><span style="width:8px;height:8px;border-radius:50%;background:var(--coral);display:inline-block"></span> Acrescentados na execução</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Pipeline técnico -->
+    <div style="margin-top:3.5rem">
+      <h3 style="font-size:1.05rem;color:var(--navy);margin-bottom:1.2rem">Pipeline técnico</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--border);border-radius:var(--r);overflow:hidden">
+        <div style="background:var(--panel);padding:1.1rem 1.2rem">
+          <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:.4rem">1 · Coleta</div>
+          <div style="font-size:.88rem;color:var(--ink)">YouTube Data API v3 + Chat Replay scraper; armazenamento em Parquet (pyarrow)</div>
+        </div>
+        <div style="background:var(--panel);padding:1.1rem 1.2rem">
+          <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:.4rem">2 · Filtro</div>
+          <div style="font-size:.88rem;color:var(--ink)">Recorte temporal 20/05/2026–20/06/2026 via <code>pd.Timestamp</code> + tz America/São_Paulo</div>
+        </div>
+        <div style="background:var(--panel);padding:1.1rem 1.2rem">
+          <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:.4rem">3 · Processamento</div>
+          <div style="font-size:.88rem;color:var(--ink)">TF-IDF, z-score, Jaccard, PCA, t-SNE, Ward linkage, detecção de spam via Counter</div>
+        </div>
+        <div style="background:var(--panel);padding:1.1rem 1.2rem">
+          <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:.4rem">4 · Visualização</div>
+          <div style="font-size:.88rem;color:var(--ink)">Plotly + Kaleido, Matplotlib Agg, WordCloud, NetworkX, 27 PNGs exportados</div>
+        </div>
+        <div style="background:var(--panel);padding:1.1rem 1.2rem">
+          <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:.4rem">5 · Apresentação</div>
+          <div style="font-size:.88rem;color:var(--ink)">Site, Artigo, Vídeo e Apresentação</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     EIXO A
+═══════════════════════════════════════════════════ -->
+<section id="eixo-a" class="viz-section">
+  <div class="container">
+    <div class="eixo-divider a">
+      <div class="eixo-badge">A</div>
+      <div class="eixo-divider-text">
+        <h2>Eixo A · Visualização de Dados Multivariados</h2>
+        <p>Quais canais apresentam padrões semelhantes ou distintos de engajamento, volume, diversidade de audiência e intensidade temporal?</p>
+      </div>
+    </div>
+
+    <div class="viz-grid">
+      <!-- A1 -->
+      <div class="viz-card" onclick="openModal('a1')">
+        <div class="viz-img"><img src="./graficos/eixo_a/a1_scatter.png" alt="A1 Scatter" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">A1 · Scatter plot</div>
+          <h3>Participantes únicos × volume de chat</h3>
+          <p class="question">O canal tem muitos participantes diferentes ou poucos usuários muito ativos?</p>
+          <ul class="insights">
+            <li>Revista Oeste lidera em autores únicos (23.463); CNN Brasil concentra o maior volume de msgs (714.329).</li>
+            <li>Canais no quadrante superior direito combinam base ampla com alto volume — chat mais democrático.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- A2 -->
+      <div class="viz-card" onclick="openModal('a2')">
+        <div class="viz-img"><img src="./graficos/eixo_a/a2_heatmap_zscore.png" alt="A2 Heatmap Z-score" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">A2 · Heatmap z-score</div>
+          <h3>Perfil multivariado por canal</h3>
+          <p class="question">Como comparar os 12 canais em várias dimensões ao mesmo tempo?</p>
+          <ul class="insights">
+            <li>TV 247 destaca-se em % de recorrentes e super chat; Revista Oeste em autores únicos e views totais.</li>
+            <li>Nenhum canal é forte em todas as dimensões — "assinaturas" editoriais distintas.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- A3 -->
+      <div class="viz-card" onclick="openModal('a3')">
+        <div class="viz-img"><img src="./graficos/eixo_a/a3_paralelas.png" alt="A3 Coordenadas paralelas" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">A3 · Coordenadas paralelas</div>
+          <h3>Trajetória de cada canal no espaço de métricas</h3>
+          <p class="question">Como cada canal percorre o espaço de todas as métricas simultaneamente?</p>
+          <ul class="insights">
+            <li>CNN Brasil e Metrópoles TV cruzam em direções opostas em "duração mediana" e "msgs/1k".</li>
+            <li>Poder360 traça uma linha com valores extremamente baixos — nicho especializado.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- A4 -->
+      <div class="viz-card" onclick="openModal('a4')">
+        <div class="viz-img"><img src="./graficos/eixo_a/a4_pca.png" alt="A4 PCA" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">A4 · PCA</div>
+          <h3>Agrupamentos por perfil multivariado</h3>
+          <p class="question">Quais canais têm perfis parecidos e quais se distanciam do grupo?</p>
+          <ul class="insights">
+            <li>Os dois primeiros componentes sintetizam >55% da variância.</li>
+            <li>TV 247 aparece isolado; CNN Brasil, Revista Oeste e Jovem Pan formam o grupo de maior alcance.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     EIXO B
+═══════════════════════════════════════════════════ -->
+<section id="eixo-b" class="viz-section">
+  <div class="container">
+    <div class="eixo-divider b">
+      <div class="eixo-badge">B</div>
+      <div class="eixo-divider-text">
+        <h2>Eixo B · Visualização de Documentos e Textos</h2>
+        <p>Quais temas, emoções e padrões discursivos aparecem nos chats e como se relacionam com os assuntos das transmissões?</p>
+      </div>
+    </div>
+
+    <div class="viz-grid">
+      <!-- B1 -->
+      <div class="viz-card wide" onclick="openModal('b1')">
+        <div class="viz-img" style="aspect-ratio:16/7"><img src="./graficos/eixo_b/b1_wordcloud.png" alt="B1 Wordcloud" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">B1 · Nuvem de palavras</div>
+          <h3>Vocabulário do chat por canal</h3>
+          <p class="question">Que vocabulário cada comunidade de chat usa com mais frequência?</p>
+          <ul class="insights">
+            <li>Nomes próprios (políticos e figuras públicas) dominam todos os canais — o chat como "placar político".</li>
+            <li>Gazeta do Povo e ICL Notícias têm vocabulário com forte presença de "moraes" e "stf".</li>
+            <li>TV 247 e Jovem Pan News mostram o contraste ideológico mais nítido pelo vocabulário.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- B2 -->
+      <div class="viz-card" onclick="openModal('b2')">
+        <div class="viz-img"><img src="./graficos/eixo_b/b2_temas.png" alt="B2 Temas" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">B2 · Heatmap temático</div>
+          <h3>Intensidade temática por canal (transcrições)</h3>
+          <p class="question">Quais temas cada canal mobiliza mais na fala?</p>
+          <ul class="insights">
+            <li>Política nacional domina em todos, com maior intensidade em UOL, Gazeta e Metrópoles.</li>
+            <li>Economia é o tema menos explorado na fala de todos os canais.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- B3 -->
+      <div class="viz-card" onclick="openModal('b3')">
+        <div class="viz-img"><img src="./graficos/eixo_b/b3_timeline.png" alt="B3 Timeline" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">B3 · Timeline de termos</div>
+          <h3>Quando cada tema explode na fala dos canais</h3>
+          <p class="question">Em que momentos do período determinados termos ganham destaque?</p>
+          <ul class="insights">
+            <li>"Lula" e "bolsonaro" concentram os maiores picos, coincidindo com eventos noticiosos.</li>
+            <li>"Flamengo" e "dólar" aparecem como picos pontuais — pauta episódica.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- B4 -->
+      <div class="viz-card" onclick="openModal('b4')">
+        <div class="viz-img"><img src="./graficos/eixo_b/b4_tsne.png" alt="B4 t-SNE" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">B4 · t-SNE</div>
+          <h3>Mapa de tópicos das lives</h3>
+          <p class="question">Lives com conteúdo parecido ficam próximas no espaço de tópicos?</p>
+          <ul class="insights">
+            <li>Cada ponto é uma live (25 por canal); proximidade = parecença de conteúdo (TF-IDF).</li>
+            <li>TV 247 e ICL Notícias formam clusters próximos; CNN Brasil ocupa uma região ampla.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- B5 -->
+      <div class="viz-card" onclick="openModal('b5')">
+        <div class="viz-img"><img src="./graficos/eixo_b/b5_fala_chat.png" alt="B5 Fala vs Chat" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">B5 · Fala × Chat</div>
+          <h3>O que o canal fala vs. o que o chat replica</h3>
+          <p class="question">O público amplifica no chat o que o canal fala ou fala outra coisa?</p>
+          <ul class="insights">
+            <li>Pontos acima da diagonal: o chat fala mais do que os apresentadores — sinal de amplificação.</li>
+            <li>Nomes de políticos são fortemente amplificados; termos técnicos ficam abaixo da diagonal.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- B6 -->
+      <div class="viz-card" onclick="openModal('b6')">
+        <div class="viz-img"><img src="./graficos/eixo_b/b6_emojis.png" alt="B6 Emojis" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">B6 · Emojis</div>
+          <h3>Emojis como proxy de emoção e posição</h3>
+          <p class="question">O público sinaliza posição e emoção por meio dos emojis no chat?</p>
+          <ul class="insights">
+            <li>A bandeira do Brasil domina quase todos os canais.</li>
+            <li>ICL Notícias e TV 247 usam a bandeira dos EUA em maior proporção relativa.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     EIXO C
+═══════════════════════════════════════════════════ -->
+<section id="eixo-c" class="viz-section">
+  <div class="container">
+    <div class="eixo-divider c">
+      <div class="eixo-badge">C</div>
+      <div class="eixo-divider-text">
+        <h2>Eixo C · Visualização de Árvores e Grafos</h2>
+        <p>Como os usuários se distribuem entre os canais e quais canais compartilham audiência ativa?</p>
+      </div>
+    </div>
+
+    <div class="viz-grid">
+      <!-- C1 -->
+      <div class="viz-card" onclick="openModal('c1')">
+        <div class="viz-img"><img src="./graficos/eixo_c/c1_overlap.png" alt="C1 Matriz Jaccard" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">C1 · Matriz Jaccard 12×12</div>
+          <h3>Sobreposição de público entre pares de canais</h3>
+          <p class="question">Qual a interseção de audiência ativa entre cada par de canais?</p>
+          <ul class="insights">
+            <li>Maior Jaccard: 0,0553 entre CNN Brasil e Jovem Pan News.</li>
+            <li>A maioria dos pares fica abaixo de 0,03 — públicos majoritariamente segmentados.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- C2 -->
+      <div class="viz-card" onclick="openModal('c2')">
+        <div class="viz-img"><img src="./graficos/eixo_c/c2_grafo.png" alt="C2 Grafo" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">C2 · Grafo de sobreposição</div>
+          <h3>Rede de audiência compartilhada</h3>
+          <p class="question">Quais canais formam o núcleo mais conectado?</p>
+          <ul class="insights">
+            <li>Revista Oeste, CNN Brasil, Jovem Pan e UOL formam o núcleo mais densamente conectado.</li>
+            <li>TV Cultura Jornalismo aparece isolada — confirma padrão da matriz Jaccard.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- C3 -->
+      <div class="viz-card" onclick="openModal('c3')">
+        <div class="viz-img"><img src="./graficos/eixo_c/c3_cordas.png" alt="C3 Diagrama de cordas" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">C3 · Diagrama de cordas</div>
+          <h3>Circulação de público ao redor do ecossistema</h3>
+          <p class="question">Como a audiência compartilhada se distribui ao redor dos canais?</p>
+          <ul class="insights">
+            <li>Espessura da corda ∝ autores em comum. Cordas mais espessas: CNN, Jovem Pan e Revista Oeste.</li>
+            <li>Canais de nicho (Poder360, TV Cultura) têm poucas cordas — menor circulação.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- C4 -->
+      <div class="viz-card" onclick="openModal('c4')">
+        <div class="viz-img"><img src="./graficos/eixo_c/c4_sankey.png" alt="C4 Sankey" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">C4 · Sankey de migração</div>
+          <h3>Migração de público entre canais</h3>
+          <p class="question">Para onde vão os usuários que comentam em mais de um canal?</p>
+          <ul class="insights">
+            <li>12,5% dos autores (12.374 de 98.881) comentaram em 2+ canais.</li>
+            <li>Maior fluxo: Revista Oeste → Metrópoles TV (1.624 autores compartilhados).</li>
+          </ul>
+        </div>
+      </div>
+      <!-- C5 -->
+      <div class="viz-card wide" onclick="openModal('c5')">
+        <div class="viz-img" style="aspect-ratio:16/7"><img src="./graficos/eixo_c/c5_dendrograma.png" alt="C5 Dendrograma" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">C5 · Dendrograma (Ward)</div>
+          <h3>Hierarquia de similaridade entre canais</h3>
+          <p class="question">Quais canais têm perfil multivariado mais semelhante e se agrupam hierarquicamente?</p>
+          <ul class="insights">
+            <li>CNN Brasil e Jovem Pan News se fundem primeiro — perfil mais próximo entre todos os pares.</li>
+            <li>TV 247 só se junta aos demais no último corte — confirma isolamento visto no PCA.</li>
+            <li>Poder360 e TV Cultura formam um ramo de canais de menor porte e alcance.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     INSIGHTS ADICIONAIS (exploratórios)
+═══════════════════════════════════════════════════ -->
+<section id="insights" class="viz-section">
+  <div class="container">
+    <p class="kicker">Análises exploratórias</p>
+    <h2 style="margin:.4rem 0 .6rem">Insights adicionais</h2>
+    <p class="lead" style="margin-bottom:2.5rem">Visualizações suplementares dos notebooks N1 e N3, aprofundando comportamento de audiência, spam, sentimento e evolução temática.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem" class="insights-extra-grid">
+      <div class="viz-card" onclick="openModal('n1_curva')">
+        <div class="viz-img"><img src="./graficos/exploratoria/n1_curva_audiencia.png" alt="Curva de audiência" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">N1 · Curva de audiência</div>
+          <h3>Audiência simultânea média por canal</h3>
+          <p class="question">Qual o padrão de audiência ao longo das transmissões?</p>
+        </div>
+      </div>
+      <div class="viz-card" onclick="openModal('n1_eng')">
+        <div class="viz-img"><img src="./graficos/exploratoria/n1_audiencia_engajamento.png" alt="Audiência vs Engajamento" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">N1 · Audiência × Engajamento</div>
+          <h3>Relação entre audiência e atividade no chat</h3>
+          <p class="question">Canais com mais audiência têm mais chat?</p>
+        </div>
+      </div>
+      <div class="viz-card" onclick="openModal('n1_heatmap')">
+        <div class="viz-img"><img src="./graficos/exploratoria/n1_heatmap_horario.png" alt="Heatmap horário" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">N1 · Heatmap horário</div>
+          <h3>Concentração de lives por dia e hora</h3>
+          <p class="question">Em que horários cada canal transmite mais?</p>
+        </div>
+      </div>
+      <div class="viz-card" onclick="openModal('n1_super')">
+        <div class="viz-img"><img src="./graficos/exploratoria/n1_superchat.png" alt="Super chat" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">N1 · Super Chat</div>
+          <h3>Volume e valor de Super Chats por canal</h3>
+          <p class="question">Quem monetiza mais via Super Chat?</p>
+        </div>
+      </div>
+      <div class="viz-card" onclick="openModal('n3_ret')">
+        <div class="viz-img"><img src="./graficos/exploratoria/n3_retencao.png" alt="Retenção" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">N3 · Retenção intra-live</div>
+          <h3>% de espectadores que permanecem no último quarto</h3>
+          <p class="question">Os espectadores ficam até o fim das transmissões?</p>
+        </div>
+      </div>
+      <div class="viz-card" onclick="openModal('n3_spam')">
+        <div class="viz-img"><img src="./graficos/exploratoria/n3_spam.png" alt="Spam" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">N3 · Spam / Raids</div>
+          <h3>Episódios de spam — minutos com ≥10 msgs idênticas</h3>
+          <p class="question">Há padrões de spam/raid no chat?</p>
+        </div>
+      </div>
+      <div class="viz-card" onclick="openModal('n3_sent')">
+        <div class="viz-img"><img src="./graficos/exploratoria/n3_sentimento.png" alt="Sentimento" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">N3 · Sentimento</div>
+          <h3>Temperatura emocional do chat por canal</h3>
+          <p class="question">Há diferença de tom emocional entre os chats?</p>
+        </div>
+      </div>
+      <div class="viz-card" onclick="openModal('n3_ev')">
+        <div class="viz-img"><img src="./graficos/exploratoria/n3_evolucao_tematica.png" alt="Evolução temática" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">N3 · Evolução temática</div>
+          <h3>Top 12 termos mais variáveis semana a semana</h3>
+          <p class="question">Como os temas evoluem ao longo do período?</p>
+        </div>
+      </div>
+      <div class="viz-card" onclick="openModal('n3_over')">
+        <div class="viz-img"><img src="./graficos/exploratoria/n3_overlap_matrix.png" alt="Overlap matrix" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">N3 · Overlap Matrix</div>
+          <h3>Matriz de autores compartilhados (contagem absoluta)</h3>
+          <p class="question">Quantos autores em comum há entre cada par?</p>
+        </div>
+      </div>
+      <div class="viz-card" onclick="openModal('n3_likes')">
+        <div class="viz-img"><img src="./graficos/exploratoria/n3_likes_audiencia.png" alt="Likes vs Audiência" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">N3 · Likes × Audiência</div>
+          <h3>Correlação entre likes e pico de audiência</h3>
+          <p class="question">Likes e audiência andam juntos?</p>
+        </div>
+      </div>
+      <div class="viz-card" onclick="openModal('n3_funil')">
+        <div class="viz-img"><img src="./graficos/exploratoria/n3_funil.png" alt="Funil" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">N3 · Funil de engajamento</div>
+          <h3>Views → Audiência simultânea → Chat → Super Chat</h3>
+          <p class="question">Qual a taxa de conversão a cada nível de engajamento?</p>
+        </div>
+      </div>
+      <div class="viz-card" onclick="openModal('n3_dur')">
+        <div class="viz-img"><img src="./graficos/exploratoria/n3_duracao.png" alt="Duração" loading="lazy"></div>
+        <div class="viz-body">
+          <div class="viz-id">N3 · Duração das lives</div>
+          <h3>Distribuição de duração por canal</h3>
+          <p class="question">Quanto tempo dura uma live típica em cada canal?</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     CONCLUSÕES
+═══════════════════════════════════════════════════ -->
+<section id="conclusoes">
+  <div class="container">
+    <p class="kicker">Conclusões</p>
+    <h2 style="margin:.4rem 0 .6rem">O que os três eixos revelam, juntos</h2>
+    <p class="lead">Quatro achados principais emergem da análise integrada dos dados multivariados, textuais e de grafo.</p>
+    <div class="conclusions-grid">
+      <div class="conclusion-card">
+        <h3>Audiências majoritariamente segmentadas</h3>
+        <p>O maior índice Jaccard observado é 0,0553 — entre CNN Brasil e Jovem Pan News. Cada canal mantém predominantemente seu próprio público no período de 30 dias. Não há indício de "pool de audiência" fluido.</p>
+      </div>
+      <div class="conclusion-card">
+        <h3>Quem circula, importa</h3>
+        <p>Apesar da segmentação, 12,5% dos comentaristas (12.374 de 98.881 pessoas) apareceram em mais de um canal — um fluxo cross-editorial mensurável e relevante para estratégias de audiência.</p>
+      </div>
+      <div class="conclusion-card">
+        <h3>Perfis multivariados distintos</h3>
+        <p>PCA e dendrograma convergem: TV 247 é o canal mais isolado no espaço de métricas; CNN Brasil, Revista Oeste e Jovem Pan News formam o grupo de maior alcance e intensidade de chat.</p>
+      </div>
+      <div class="conclusion-card">
+        <h3>Assinatura temática e emocional</h3>
+        <p>Cada canal mobiliza temas e emojis em proporções diferentes. Política domina, mas pauta internacional diferencia CNN Brasil e TV Cultura; esporte diferencia Jovem Pan. O chat polariza mais do que os apresentadores.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     LIMITAÇÕES
+═══════════════════════════════════════════════════ -->
+<section id="limitacoes">
+  <div class="container">
+    <p class="kicker">Limitações e próximos passos</p>
+    <h2 style="margin:.4rem 0 2rem">O que este recorte não captura</h2>
+    <div class="limits-grid">
+      <div class="limits-col">
+        <h3>Limitações do recorte atual</h3>
+        <ul>
+          <li>Usuários "lurkers" (audiência que assiste sem comentar) não são rastreáveis neste desenho.</li>
+          <li>Sem dados demográficos — exigiriam OAuth e autorização explícita do usuário.</li>
+          <li>Léxico de temas é baseado em regras simples; pode subestimar nuances discursivas.</li>
+          <li>Amostra concentrada em jornalismo de centro a centro-direita — poucos canais de esquerda.</li>
+          <li>Análise de sentimento via léxico; sem modelo supervisionado específico para PT-BR.</li>
+        </ul>
+      </div>
+      <div class="limits-col next-col">
+        <h3>Próximos passos</h3>
+        <ul>
+          <li>Análise de sentimento supervisionada (BERTimbau fine-tuned), além da leitura indireta via emojis.</li>
+          <li>Embeddings semânticos para capturar nuances que o léxico de regras não vê.</li>
+          <li>Replicar a metodologia em outros setores (entretenimento, esporte, finanças).</li>
+          <li>Consolidar o white paper de ~25 páginas e publicar o dataset agregado anonimizado.</li>
+          <li>Publicar coletor e scripts de análise em repositório aberto.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     APLICAÇÕES PROFISSIONAIS
+═══════════════════════════════════════════════════ -->
+<section id="aplicacoes">
+  <div class="container">
+    <p class="kicker">Aplicações profissionais</p>
+    <h2 style="margin:.4rem 0 .6rem">Como este estudo pode ser utilizado</h2>
+    <p class="lead" style="max-width:720px">A metodologia desenvolvida vai além de um trabalho acadêmico — ela oferece um instrumental replicável para qualquer organização que precise entender seu ecossistema de audiência no YouTube.</p>
+    <div class="use-grid">
+      <div class="use-card">
+        <div class="use-icon">📡</div>
+        <h3>Inteligência competitiva para veículos de comunicação</h3>
+        <p>Identificar quais concorrentes compartilham sua base de comentaristas ativos — e qual a intensidade desse overlap — orienta decisões de posicionamento editorial e frequência de transmissão.</p>
+      </div>
+      <div class="use-card">
+        <div class="use-icon">🎯</div>
+        <h3>Planejamento de mídia e patrocínio</h3>
+        <p>Anunciantes podem mensurar a sobreposição de público entre canais antes de fechar cotas de patrocínio, evitando duplicidade de impacto e otimizando alcance líquido de audiência engajada.</p>
+      </div>
+      <div class="use-card">
+        <div class="use-icon">🔬</div>
+        <h3>Pesquisa de opinião pública e agenda-setting</h3>
+        <p>O vocabulário do chat e a análise temporal de termos-chave funcionam como proxy de reação a eventos noticiosos em tempo quase real — sem o custo de surveys tradicionais.</p>
+      </div>
+      <div class="use-card">
+        <div class="use-icon">📊</div>
+        <h3>Auditoria de audiência para plataformas e reguladores</h3>
+        <p>A metodologia de hash (SHA-256 + salt) permite rastrear comportamento de audiência sem expor dados pessoais, alinhando-se à LGPD e tornando a análise auditável por terceiros.</p>
+      </div>
+      <div class="use-card">
+        <div class="use-icon">🏛️</div>
+        <h3>Monitoramento de desinformação e campanhas coordenadas</h3>
+        <p>A detecção de spam/raids e o mapeamento de termos amplificados pelo chat (vs. fala do canal) permitem identificar padrões de comportamento coordenado em tempo de crise.</p>
+      </div>
+      <div class="use-card">
+        <div class="use-icon">📈</div>
+        <h3>Estratégia de crescimento de canais</h3>
+        <p>Canais menores podem identificar quais públicos de canais maiores têm maior probabilidade de engajamento — e direcionar conteúdo para capturar essa audiência compartilhada.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     RECURSOS: VÍDEO + ARTIGO
+═══════════════════════════════════════════════════ -->
+<section id="recursos">
+  <div class="container">
+    <p class="kicker">Recursos</p>
+    <h2 style="margin:.4rem 0 .6rem">Apresentação em vídeo e artigo completo</h2>
+    <p class="lead">Acesse a apresentação gravada do estudo e o artigo acadêmico completo com metodologia detalhada, resultados e referências bibliográficas.</p>
+    <div class="recursos-grid">
+      <!-- Vídeo -->
+      <div>
+        <h3 style="font-size:1.05rem;color:var(--navy);margin-bottom:1rem">🎬 Apresentação em vídeo</h3>
+        <div class="video-wrap" id="videoWrap" data-videoid="j80Dfvv39IY">
+          <div class="video-placeholder" id="videoPlaceholder">
+            <div class="play-btn">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div>
+              <strong style="color:#fff;font-size:1rem">Vídeo em breve</strong>
+              <p>A gravação da apresentação do estudo será publicada no YouTube. O link será inserido aqui assim que disponível.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Artigo -->
+      <div class="artigo-box">
+        <div>
+          <h3>📄 Artigo completo</h3>
+          <p>O artigo acadêmico documenta em detalhe a metodologia de coleta, o processo de anonimização, as escolhas de visualização para cada eixo e a análise interpretativa dos resultados.</p>
+        </div>
+        <div>
+          <div class="artigo-meta">
+            <span>📅 Junho de 2026</span>
+            <span>🏫 USP-ICMC-MECAI</span>
+            <span>📘 MAI5017 - Visualização da Informação</span>
+          </div>
+          <div class="artigo-meta" style="margin-top:.3rem">
+            <span>✍️ Pereira, J. · Soares, W. · Marques, J.F.</span>
+          </div>
+        </div>
+        <div>
+          <a href="./artigo/Artigo.pdf" class="btn-pdf" id="btnPdf" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM12 18H8v-1h4v1zm4-3H8v-1h8v1zm0-3H8v-1h8v1z"/></svg>
+            Download do Artigo (PDF)
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     REPOSITÓRIO GITHUB
+═══════════════════════════════════════════════════ -->
+<section id="repositorio">
+  <div class="container">
+    <p class="kicker">Códigos e arquivos</p>
+    <h2 style="margin:.4rem 0 .6rem">Repositório no GitHub</h2>
+    <p class="lead">Todos os arquivos utilizados nesse estudo estão disponíveis no repositório do Github.</p>
+
+    <div class="repo-card">
+      <!-- Ícone GitHub -->
+      <div class="repo-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+        </svg>
+      </div>
+
+      <!-- Informações -->
+      <div class="repo-info">
+        <h3>MAI5017-Visualizacao-da-Informacao</h3>
+        <p>Pipeline completa de coleta, anonimização e visualização da audiência de transmissões ao vivo do YouTube. Inclui os notebooks Jupyter, scripts Python, dados agregados anonimizados (SHA-256 + salt) e o código de geração de todos os 27 gráficos do estudo.</p>
+
+        <!-- URL do repositório — substitua pelo link real -->
+        <div class="repo-url-box">
+          <code id="repoUrl">https://github.com/wsoaresjr/MAI5017-Visualizacao-da-Informacao</code>
+          <a href="https://github.com/wsoaresjr/MAI5017-Visualizacao-da-Informacao" id="repoLink" class="btn-repo" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            Acessar repositório
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     EQUIPE
+═══════════════════════════════════════════════════ -->
+<section id="equipe">
+  <div class="container">
+    <p class="kicker">Equipe</p>
+    <h2 style="margin:.4rem 0 .4rem">Grupo de pesquisa</h2>
+    <p class="lead">Disciplina MAI5017 — Visualização da Informação · Prof. Afonso Paiva · ICMC-USP · Junho 2026</p>
+    <div class="team-grid">
+
+      <div class="team-card">
+        <div class="team-photo-wrap">
+          <img 
+            src="./graficos/fotos/janderson.png" 
+            alt="Janderson Pereira"
+            onerror="this.style.display='none'; document.getElementById('fallback-j').style.display='flex';"
+          >
+          <div class="team-photo-fallback" id="fallback-j" style="background:var(--teal)">J</div>
+        </div>
+        <h4>Janderson Pereira</h4>
+        <a class="team-email" href="mailto:janderson.pereira@usp.br">janderson.pereira@usp.br</a>
+        <a class="team-linkedin" href="linkedin.com/in/trifenol" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="#0a66c2"><path d="M20.45 20.45h-3.554v-5.569c0-1.328-.025-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.354V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.284zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.45zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+
+      <div class="team-card">
+        <div class="team-photo-wrap">
+          <img 
+            src="./graficos/fotos/walter.png" 
+            alt="Walter Soares Antonio Junior"
+            onerror="this.style.display='none'; document.getElementById('fallback-w').style.display='flex';"
+          >
+          <div class="team-photo-fallback" id="fallback-w" style="background:var(--teal)">W</div>
+        </div>
+        <h4>Walter Soares Antonio Junior</h4>
+        <a class="team-email" href="mailto:walter.soares@usp.br">walter.soares@usp.br</a>
+        <a class="team-linkedin" href="https://www.linkedin.com/in/walter-soares/" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="#0a66c2"><path d="M20.45 20.45h-3.554v-5.569c0-1.328-.025-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.354V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.284zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.45zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+
+      <div class="team-card">
+        <div class="team-photo-wrap">
+          <img 
+            src="./graficos/fotos/junior.png" 
+            alt="Junior Fernandes Marques"
+            onerror="this.style.display='none'; document.getElementById('fallback-jr').style.display='flex';"
+          >
+          <div class="team-photo-fallback" id="fallback-jr" style="background:var(--teal)">Jr</div>
+        </div>
+        <h4>Junior Fernandes Marques</h4>
+        <a class="team-email" href="mailto:junior.marques@usp.br">junior.marques@usp.br</a>
+        <a class="team-linkedin" href="linkedin.com/in/juniorfernandes27" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="#0a66c2"><path d="M20.45 20.45h-3.554v-5.569c0-1.328-.025-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.354V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.284zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.45zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     RODAPÉ
+═══════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <span>MAI5017 · Visualização da Informação · USP-ICMC-MECAI · 2026</span>
+    <span>Dados: YouTube Data API v3 (fontes públicas)</span>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════════════
+     MODAL
+═══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-head">
+      <h3 id="modalTitle"></h3>
+      <button class="modal-close" onclick="closeModalBtn()">✕</button>
+    </div>
+    <img id="modalImg" class="modal-img" src="" alt="">
+    <div class="modal-body">
+      <p id="modalQuestion" style="font-style:italic;color:var(--muted);margin-bottom:.8rem"></p>
+      <ul class="modal-insights" id="modalInsights"></ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════ -->
+<script>
+// Nav toggle
+document.getElementById('navToggle').addEventListener('click', () => {
+  document.getElementById('navLinks').classList.toggle('open');
+});
+
+
+(function() {
+  const wrap = document.getElementById('videoWrap');
+  const vid = wrap && wrap.dataset.videoid;
+  if (vid && vid.trim()) {
+    const iframe = document.createElement('iframe');
+    // Link do YouTube
+    iframe.src = 'https://www.youtube.com/embed/' + vid.trim() + '?rel=0&modestbranding=1';
+    iframe.title = 'Apresentação do Estudo';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    iframe.allowFullscreen = true;
+    document.getElementById('videoPlaceholder').replaceWith(iframe);
+  }
+})();
+
+// Scroll reveal
+const revealEls = document.querySelectorAll('.viz-card, .conclusion-card, .eixo-card, .about-card, .team-card');
+revealEls.forEach(el => el.classList.add('reveal'));
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+}, { threshold: 0.08 });
+revealEls.forEach(el => obs.observe(el));
+
+// Modal data
+const MODALS = {
+  a1: { title:'A1 · Participantes únicos × volume de chat', img:'./graficos/eixo_a/a1_scatter.png', q:'O canal tem muitos participantes diferentes ou poucos usuários muito ativos?', insights:['Tamanho da bolha = views totais no período filtrado (20/05–20/06).','Revista Oeste lidera em autores únicos (23.463); CNN Brasil concentra o maior volume de msgs (714.329).','Canais no canto superior direito combinam base ampla de comentaristas com alto volume — chat mais democrático.','TV Cultura Jornalismo opera em outra escala: poucos autores e poucas mensagens.']},
+  a2: { title:'A2 · Perfil multivariado por canal (z-score)', img:'./graficos/eixo_a/a2_heatmap_zscore.png', q:'Como comparar os 12 canais em várias dimensões ao mesmo tempo?', insights:['Cada linha é um canal; cada coluna, uma métrica padronizada (z-score) — vermelho acima da média, azul abaixo.','TV 247 destaca-se em % de recorrentes e super chat; Revista Oeste em autores únicos e views totais.','CNN Brasil lidera em mensagens por 1k views — engajamento de chat mais intenso.','Nenhum canal é forte em todas as dimensões — "assinaturas" editoriais distintas.']},
+  a3: { title:'A3 · Coordenadas paralelas dos canais', img:'./graficos/eixo_a/a3_paralelas.png', q:'Como cada canal percorre o espaço de todas as métricas simultaneamente?', insights:['Cada linha colorida é um canal; cada eixo vertical, uma métrica diferente.','Linhas que cruzam no mesmo ponto revelam canais com comportamento semelhante naquela métrica.','CNN Brasil e Metrópoles TV cruzam de formas opostas em "duração mediana" e "msgs/1k".','Poder360 traça uma linha com valores extremamente baixos — nicho especializado.']},
+  a4: { title:'A4 · PCA dos canais — agrupamentos por perfil', img:'./graficos/eixo_a/a4_pca.png', q:'Quais canais têm perfis multivariados parecidos e quais se distanciam do grupo?', insights:['Os dois primeiros componentes sintetizam >55% da variância.','TV 247 aparece isolado — perfil atípico (recorrência e super chat altos, pico médio baixo).','CNN Brasil, Revista Oeste e Jovem Pan News formam o grupo de maior alcance e chat intenso.','Poder360, Band e TV Cultura formam um agrupamento de canais mais nichados.']},
+  b1: { title:'B1 · Nuvem de palavras do chat por canal', img:'./graficos/eixo_b/b1_wordcloud.png', q:'Que vocabulário cada comunidade de chat usa com mais frequência?', insights:['Tamanho da palavra = frequência relativa no chat, após remoção de stopwords.','Nomes próprios de políticos dominam todos os canais — o chat como "placar político".','Gazeta do Povo e ICL Notícias têm vocabulário com forte presença de "moraes" e "stf".','TV 247 e Jovem Pan News mostram o contraste ideológico mais nítido pelo vocabulário.']},
+  b2: { title:'B2 · Intensidade temática por canal (transcrições)', img:'./graficos/eixo_b/b2_temas.png', q:'Quais temas cada canal mobiliza mais na fala?', insights:['Escala: menções a cada tema por 10 mil palavras de transcrição.','Política nacional domina em todos, com maior intensidade em UOL, Gazeta e Metrópoles.','CNN Brasil e TV Cultura se destacam em pauta internacional; Jovem Pan em esporte.','Economia é o tema menos explorado na fala de todos os canais do recorte.']},
+  b3: { title:'B3 · Timeline de termos-chave nas transcrições', img:'./graficos/eixo_b/b3_timeline.png', q:'Em que momentos do período determinados termos ganham destaque?', insights:['Menções diárias a termos-chave nas transcrições — período 20/05 a 20/06/2026.','\"Lula\" e \"bolsonaro\" concentram os maiores picos, coincidindo com eventos noticiosos.','Termos internacionais (\"trump\", \"israel\") mantêm presença constante, mas menor amplitude.','\"Flamengo\" e \"dólar\" aparecem como picos pontuais — pauta esportiva/econômica é episódica.']},
+  b4: { title:'B4 · Mapa de tópicos das lives (t-SNE)', img:'./graficos/eixo_b/b4_tsne.png', q:'Lives com conteúdo parecido ficam próximas no espaço de tópicos?', insights:['Cada ponto é uma live (25 por canal); proximidade = parecença de conteúdo (TF-IDF).','Canais de viés editorial similar (TV 247, ICL Notícias) formam clusters próximos.','CNN Brasil ocupa uma região ampla — pauta mais diversificada.','Jovem Pan News e Gazeta do Povo aparecem intercalados — vocabulário próximo.']},
+  b5: { title:'B5 · Fala dos canais × reação do chat', img:'./graficos/eixo_b/b5_fala_chat.png', q:'O público amplifica no chat o que o canal fala ou fala outra coisa?', insights:['Eixo X = frequência na fala; eixo Y = frequência no chat. Diagonal = equilíbrio.','Pontos acima da diagonal: o chat fala mais do que os apresentadores — sinal de amplificação.','Nomes de políticos (lula, bolsonaro, moraes) são fortemente amplificados pelo chat.','Termos técnicos e de contexto ficam abaixo — o chat polariza mais do que informa.']},
+  b6: { title:'B6 · Emojis do chat como proxy de emoção e posição', img:'./graficos/eixo_b/b6_emojis.png', q:'O público sinaliza posição e emoção também por meio dos emojis no chat?', insights:['% de uso de cada emoji em relação ao total de emojis do canal.','A bandeira do Brasil domina o chat de quase todos os canais.','ICL Notícias e TV 247 usam a bandeira dos EUA em maior proporção relativa.','Band Jornalismo e TV Cultura têm maior proporção do emoji de "indiferença" — possível ironia.']},
+  c1: { title:'C1 · Matriz de sobreposição de público (Jaccard 12×12)', img:'./graficos/eixo_c/c1_overlap.png', q:'Qual a interseção de audiência ativa entre cada par de canais?', insights:['O maior Jaccard é 0,0553 — entre CNN Brasil e Jovem Pan News.','A maioria dos pares fica abaixo de 0,03 — públicos majoritariamente segmentados.','CNN Brasil, Jovem Pan e Revista Oeste formam o trio com overlaps relativamente mais altos.','TV Cultura Jornalismo tem sobreposição próxima de zero com quase todos os demais.']},
+  c2: { title:'C2 · Grafo de sobreposição entre canais', img:'./graficos/eixo_c/c2_grafo.png', q:'Quais canais formam o núcleo mais conectado?', insights:['Nó = canal (tamanho ∝ autores únicos); aresta = usuários em comum acima do limiar.','Revista Oeste, CNN Brasil, Jovem Pan e UOL formam o núcleo mais densamente conectado.','TV Cultura Jornalismo aparece isolada — confirma o padrão da matriz Jaccard.','A estrutura sugere comunidades de audiência, não silos completamente estanques.']},
+  c3: { title:'C3 · Diagrama de cordas — circulação de público', img:'./graficos/eixo_c/c3_cordas.png', q:'Como a audiência compartilhada se distribui ao redor do ecossistema de canais?', insights:['Cada arco no círculo é um canal; as cordas conectam pares com audiência compartilhada.','Espessura da corda ∝ quantidade de autores em comum entre o par.','As cordas mais espessas conectam CNN, Jovem Pan e Revista Oeste.','Canais de nicho (Poder360, TV Cultura) têm poucas cordas — menor circulação.']},
+  c4: { title:'C4 · Sankey de migração de público entre canais', img:'./graficos/eixo_c/c4_sankey.png', q:'Para onde vão os usuários que comentam em mais de um canal?', insights:['12,5% dos autores (12.374 de 98.881) comentaram em 2+ canais.','Maior fluxo: Revista Oeste → Metrópoles TV (1.624 autores compartilhados).','Faixas = sequência de 1ª participação (origem → destino), não apenas overlap simultâneo.','Canais de maior alcance funcionam como porta de entrada para concorrentes de perfil próximo.']},
+  c5: { title:'C5 · Dendrograma de similaridade entre canais', img:'./graficos/eixo_c/c5_dendrograma.png', q:'Quais canais têm perfil multivariado mais semelhante e se agrupam hierarquicamente?', insights:['Clusterização Ward sobre as mesmas métricas z-score do heatmap (A2).','CNN Brasil e Jovem Pan News se fundem primeiro — perfil mais parecido entre todos os pares.','TV 247 só se junta aos demais no último corte — confirma isolamento visto no PCA.','Poder360 e TV Cultura Jornalismo formam um ramo de canais de menor porte.']},
+  n1_curva: { title:'N1 · Curva de audiência simultânea', img:'./graficos/exploratoria/n1_curva_audiencia.png', q:'Qual o padrão de audiência ao longo das transmissões?', insights:['Audiência simultânea (CCV) média por minuto de live, por canal.','Canais como CNN Brasil e TV 247 sustentam audiências mais altas e consistentes durante toda a live.']},
+  n1_eng:   { title:'N1 · Audiência × Engajamento de chat', img:'./graficos/exploratoria/n1_audiencia_engajamento.png', q:'Canais com mais audiência têm mais engajamento no chat?', insights:['Scatter plot com pico de CCV vs. taxa de mensagens/minuto.','A relação não é linear — canais de nicho com menor audiência podem ter chats mais intensos.']},
+  n1_heatmap: { title:'N1 · Heatmap de horário das transmissões', img:'./graficos/exploratoria/n1_heatmap_horario.png', q:'Em que horários cada canal transmite mais?', insights:['Concentração de transmissões por hora e dia da semana.','Há padrões distintos de grade entre canais de telejornalismo contínuo e canais digitais.']},
+  n1_super:  { title:'N1 · Super Chat por canal', img:'./graficos/exploratoria/n1_superchat.png', q:'Quem monetiza mais via Super Chat?', insights:['TV 247 lidera em valor total de Super Chat — coerente com o alto % de recorrentes.','Super Chat como indicador de audiência mais engajada e disposta a contribuir financeiramente.']},
+  n3_ret:   { title:'N3 · Retenção intra-live', img:'./graficos/exploratoria/n3_retencao.png', q:'Os espectadores ficam até o fim das transmissões?', insights:['% de espectadores presentes no último quarto da live em relação ao pico.','Canais com programação mais estruturada tendem a manter audiência mais estável.']},
+  n3_spam:  { title:'N3 · Episódios de spam/raid', img:'./graficos/exploratoria/n3_spam.png', q:'Há padrões de spam ou raid no chat?', insights:['Minutos com ≥10 mensagens idênticas em até 1 minuto — critério de spam.','Alguns canais sofrem raids episódicos, visíveis como picos de mensagens idênticas em sequência.']},
+  n3_sent:  { title:'N3 · Sentimento do chat por canal', img:'./graficos/exploratoria/n3_sentimento.png', q:'Há diferença de tom emocional entre os chats?', insights:['Proporção de palavras positivas vs. negativas por canal (léxico LIWC-BR adaptado).','Chats com pauta mais polarizada tendem a ter maior proporção de termos negativos.']},
+  n3_ev:    { title:'N3 · Evolução temática semanal', img:'./graficos/exploratoria/n3_evolucao_tematica.png', q:'Como os temas evoluem ao longo do período?', insights:['Top 12 termos mais variáveis semana a semana nas transcrições.','Eventos noticiosos pontuais são visíveis como surtos de novos termos em semanas específicas.']},
+  n3_over:  { title:'N3 · Matriz de overlap absoluto', img:'./graficos/exploratoria/n3_overlap_matrix.png', q:'Quantos autores em comum há entre cada par de canais?', insights:['Contagem absoluta de autores que comentaram em ambos os canais do par.','Complementa a matriz Jaccard: revela pares com muitos autores em comum mas bases grandes.']},
+  n3_likes: { title:'N3 · Likes × Pico de audiência', img:'./graficos/exploratoria/n3_likes_audiencia.png', q:'Likes e audiência simultânea andam juntos?', insights:['Scatter com likes totais da live vs. pico de CCV.','A correlação existe, mas com dispersão considerável — likes são influenciados por fatores externos.']},
+  n3_funil: { title:'N3 · Funil de engajamento', img:'./graficos/exploratoria/n3_funil.png', q:'Qual a taxa de conversão a cada nível de engajamento?', insights:['Views → Audiência simultânea → Chat → Super Chat — quatro níveis de profundidade.','A taxa de conversão para chat é baixa (<5% dos views); para Super Chat é ínfima (<0.1%).']},
+  n3_dur:   { title:'N3 · Distribuição de duração das lives', img:'./graficos/exploratoria/n3_duracao.png', q:'Quanto tempo dura uma live típica em cada canal?', insights:['Box plot de duração por canal — mediana, IQR e outliers.','CNN Brasil e TV 247 têm as lives mais longas em mediana; Poder360 as mais curtas.']},
+};
+
+function openModal(id) {
+  const d = MODALS[id]; if (!d) return;
+  document.getElementById('modalTitle').textContent = d.title;
+  document.getElementById('modalImg').src = d.img;
+  document.getElementById('modalImg').alt = d.title;
+  document.getElementById('modalQuestion').textContent = d.q;
+  const ul = document.getElementById('modalInsights');
+  ul.innerHTML = '';
+  (d.insights || []).forEach(ins => {
+    const li = document.createElement('li'); li.textContent = ins; ul.appendChild(li);
+  });
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModalBtn();
+}
+function closeModalBtn() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalBtn(); });
+</script>
+</body>
+</html>
