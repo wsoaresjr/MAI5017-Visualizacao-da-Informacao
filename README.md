@@ -116,6 +116,10 @@ O projeto evidencia quatro achados principais:
 MAI5017-Visualizacao-da-Informacao/
 ├── index.html
 ├── README.md
+├── Base_Dados/
+│   └── Link_Base_de_Dados.txt
+├── apresentacao/
+│   └── Apresentacao.pdf
 ├── artigo/
 │   └── Artigo.pdf
 └── graficos/
@@ -124,6 +128,10 @@ MAI5017-Visualizacao-da-Informacao/
     ├── eixo_c/
     ├── exploratoria/
     └── fotos/
+└── jupyter-notebooks/
+    ├── analise_lives_youtube_n1.ipynb
+    ├── analise_lives_youtube_n2.ipynb
+    ├── analise_lives_youtube_n3.ipynb
 ```
 
 ## Tecnologias utilizadas
