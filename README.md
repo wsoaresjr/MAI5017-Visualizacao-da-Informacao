@@ -122,16 +122,16 @@ MAI5017-Visualizacao-da-Informacao/
 │   └── Apresentacao.pdf
 ├── artigo/
 │   └── Artigo.pdf
-└── graficos/
-    ├── eixo_a/
-    ├── eixo_b/
-    ├── eixo_c/
-    ├── exploratoria/
-    └── fotos/
+├── graficos/
+│   ├── eixo_a/
+│   ├── eixo_b/
+│   ├── eixo_c/
+│   ├── exploratoria/
+│   └── fotos/
 └── jupyter-notebooks/
     ├── analise_lives_youtube_n1.ipynb
     ├── analise_lives_youtube_n2.ipynb
-    ├── analise_lives_youtube_n3.ipynb
+    └── analise_lives_youtube_n3.ipynb
 ```
 
 ## Tecnologias utilizadas
